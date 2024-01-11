@@ -1,4 +1,4 @@
-# Simple Buffer Overflow
+# Stack-based Buffer Overflow
 ### **Warning:** Run this in a secure environment (VM)!
 
 ## Setup Instructions (Ubuntu 12.04)
