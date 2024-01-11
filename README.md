@@ -2,14 +2,15 @@
 ### **Warning:** Run this in a secure environment (VM)!
 
 ## Setup Instructions (Ubuntu 12.04)
-- **Disable** address space layout randomization (**ASLR:** Technique that is used to increase the difficulty of performing a buffer overflow attack that requires the attacker to know the location of an executable in memory)
+- **Disable** address space layout randomization (-w for current session) (**ASLR:** Technique that is used to increase the difficulty of performing a buffer overflow attack that requires the attacker to know the location of an executable in memory)
 ```
 sudo sysctl -w kernel.randomize_va_space=0
 ```
+- Disable ASLR persistently across system restarts
 ```
 sudo sysctl kernel.randomize_va_space=0 
 ```
-### **shellcode.c (demo)**
+## **shellcode.c (demo, make sure that shellcode allows you to start root shell)**
 Inside /src 
 - Execute shellcode with user priviledges
 
@@ -34,17 +35,18 @@ sudo chmod 4755 call_shellcode
 ```
 ![image running call_shellcode (root)](https://github.com/peterkary/buffer-overflow/blob/main/assets/images/pic2.png?raw=true)
 
-### **stack.c**
-- Vulnerable file (compilation with root priviledges)
+## **stack.c (vulnerable file)**
+- -z execstack: ability to execute instructions within the stack
+- -fno-stack-protector: use of stack guard for protecting stack overwrite
 ```
 gcc stack.c -o stack -z execstack -fno-stack-protector
 ```
-- -fno-stack-protector: use of stack guard for protecting stack overwrite
+- -root priviledges
 ```
 chmod 4755 stack
 ```
 
-### **exploit.c**
+## **exploit.c**
 - Creates 'badfile', fills it with NOP (0x90) instructions.
 - 'badfile' should have shellcode and the address of shellcode
 
@@ -57,14 +59,14 @@ gcc exploit.c -o exploit
 ```
 ./exploit
 ```
-- Compile stack.c with debuf flags activated
+- Compile stack.c with debug flags activated
 ```
 gcc stack.c -o stack_gdb -g -z execstack -fno-stack-protector
 ```
 - Run stack_gdb in debug mode
 - Set breakpoint to bof and run
 ![image running stack_gdb in debug mode](https://github.com/peterkary/buffer-overflow/blob/main/assets/images/pic6.png?raw=true)
-- Print the addredss of buffer[] and the content of ebp register
+- Print the address of buffer[] and the content of ebp register
 ![image finding addresses](https://github.com/peterkary/buffer-overflow/blob/main/assets/images/pic7.png?raw=true)
 
 - The addresses distance is 0x20 bytes
